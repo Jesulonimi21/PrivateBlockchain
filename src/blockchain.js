@@ -116,7 +116,7 @@ class Blockchain {
             let fiveMinutesInMillis =  5*60000;
             let meessageTime = parseInt(message.split(':')[1]);
             let currentTime = new Date().getTime();
-            if((currentTime - meessageTime)/1000 > fiveMinutesInMillis){
+            if(currentTime - meessageTime > fiveMinutesInMillis){
                 reject("Five minutes have passed since message was requested");
             };
             let isVerified =  bitcoinMessage.verify(message, address, signature);
