@@ -69,10 +69,11 @@ class Blockchain {
                block.previousBlockHash = self.chain[self.height].hash;
            }
            block.time = new Date().getTime().toString().slice(0,-3);
-           block.height =newHeight;
+           block.height = newHeight;
            block.hash = SHA256(JSON.stringify(block)).toString();
            self.height=newHeight;
            self.chain.push(block);
+           self.validateChain();
            resolve(block);
        
         });
@@ -88,7 +89,7 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            let message = `${address}:${new Date().getTime().toString()}:starRegistry`;
+            let message = `${address}:${new Date().getTime()}:starRegistry`;
             resolve(message);
         });
     }
@@ -114,9 +115,9 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             let fiveMinutesInMillis =  5*60000;
-            let meessageTime = parseInt(message.split(':')[1]);
+            let messageTime = parseInt(message.split(':')[1]);
             let currentTime = new Date().getTime();
-            if(currentTime - meessageTime > fiveMinutesInMillis){
+            if(currentTime - messageTime > fiveMinutesInMillis){
                 reject("Five minutes have passed since message was requested");
             };
             let isVerified =  bitcoinMessage.verify(message, address, signature);
@@ -215,11 +216,14 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            errorLog = self.chain.map(async(el)=>{
-                return await el.validate();
+           self.chain.map(async(el,index)=>{
+                errorLog.push (await el.validate());
+                if(index==self.chain.length-1){
+                    resolve(errorLog);
+                }
             });
 
-            resolve(errorLog);
+           
 
         });
     }

@@ -42,12 +42,18 @@ class Block {
             // Save in auxiliary variable the current block hash
             let originalHash = self.hash;                
             // Recalculate the hash of the Block
-            var recalculatedHash  = SHA256(JSON.stringify({...self,hash:undefined}));
+            var recalculatedHash  = SHA256(JSON.stringify({...self,hash:null})).toString();
             // Comparing if the hashes changed
             let isValid = originalHash == recalculatedHash;
             // Returning the Block is not valid
+    
+            if(!isValid){
+                resolve("the Block is not valid")
+            }else{
+                resolve("the Block is  valid ");
+            }
             // Returning the Block is valid
-            resolve(isValid)
+           
         });
     }
 
